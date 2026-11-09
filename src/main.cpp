@@ -1,6 +1,5 @@
 #include <Geode/Geode.hpp>
-#include <Geode/ui/SceneManager.hpp>
-#include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/CCDirector.hpp>
 #include <chrono>
 #include <cstdio>
 
@@ -67,21 +66,19 @@ public:
 	}
 };
 
-class $modify(TimerMenuLayer, MenuLayer) {
-	bool init() {
-		if (!MenuLayer::init()) return false;
+static Ref<SessionTimer> s_timer;
 
-		// create the timer once and keep it alive across every scene
-		// (menus, levels, editor, etc.)
-		static bool created = false;
-		if (!created) {
-			created = true;
-			auto timer = SessionTimer::create();
-			if (timer) {
-				timer->setZOrder(10000);
-				SceneManager::get()->keepAcrossScenes(timer);
-			}
+class $modify(TimerDirector, CCDirector) {
+	void willSwitchToScene(CCScene* scene) {
+		CCDirector::willSwitchToScene(scene);
+
+		if (!s_timer) {
+			s_timer = SessionTimer::create();
 		}
-		return true;
+		if (s_timer && scene) {
+			// move the one timer into every new scene (menus, levels, editor...)
+			s_timer->removeFromParent();
+			scene->addChild(s_timer, 10000);
+		}
 	}
 };
