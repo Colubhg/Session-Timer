@@ -1,15 +1,15 @@
 {
-	"geode": "4.6.0",
+	"geode": "6.0.0-alpha.1",
 	"gd": {
-		"win": "2.2074",
-		"android": "2.2074",
-		"mac": "2.2074",
-		"ios": "2.2074"
+		"win": "2.2091",
+		"android": "2.2091",
+		"mac": "2.2091",
+		"ios": "2.2091"
 	},
-	"id": "yourname.session-timer",
+	"id": "colubhg.session-timer",
 	"name": "Session Timer",
 	"version": "v1.0.0",
-	"developer": "yourname",
+	"developer": "Colubhg",
 	"description": "Shows how long you've been playing Geometry Dash (HH:MM:SS) in the top right corner, everywhere.",
 	"settings": {
 		"opacity": {
