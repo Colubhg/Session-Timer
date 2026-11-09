@@ -20,13 +20,13 @@ protected:
 		m_label->setAnchorPoint({1.f, 1.f});
 		this->addChild(m_label);
 
-		this->refreshStyle();
-		this->refreshText(true);
-		this->scheduleUpdate();
+		this->tick(true);
 		return true;
 	}
 
-	void refreshStyle() {
+public:
+	// called every frame from the director's draw loop
+	void tick(bool force = false) {
 		auto opacity = Mod::get()->getSettingValue<double>("opacity");
 		auto scale = Mod::get()->getSettingValue<double>("scale");
 		m_label->setScale(static_cast<float>(scale));
@@ -35,9 +35,7 @@ protected:
 		// pin to top-right of whatever screen size we're on
 		auto winSize = CCDirector::get()->getWinSize();
 		this->setPosition({winSize.width - 6.f, winSize.height - 4.f});
-	}
 
-	void refreshText(bool force = false) {
 		using namespace std::chrono;
 		auto secs = duration_cast<seconds>(steady_clock::now() - s_startTime).count();
 		if (!force && secs == m_lastShown) return;
@@ -49,12 +47,6 @@ protected:
 		m_label->setString(buf);
 	}
 
-	void update(float) override {
-		this->refreshStyle();
-		this->refreshText();
-	}
-
-public:
 	static SessionTimer* create() {
 		auto ret = new SessionTimer();
 		if (ret && ret->init()) {
@@ -80,5 +72,20 @@ class $modify(TimerDirector, CCDirector) {
 			s_timer->removeFromParent();
 			scene->addChild(s_timer, 10000);
 		}
+	}
+
+	void drawScene() {
+		if (s_timer) {
+			s_timer->tick();
+
+			// safety net: if the timer ever lost its scene, put it back
+			auto scene = this->getRunningScene();
+			if (scene && s_timer->getParent() != scene &&
+				!typeinfo_cast<CCTransitionScene*>(scene)) {
+				s_timer->removeFromParent();
+				scene->addChild(s_timer, 10000);
+			}
+		}
+		CCDirector::drawScene();
 	}
 };
